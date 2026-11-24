@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Beranda | E-Vote Mahasiswa{% endblock %}
+{% block content %}
+<section class="hero">
+  <div>
+    <span class="eyebrow">ELECTRONIC VOTING SYSTEM</span>
+    <h1>Pemilihan Ketua Himpunan Mahasiswa</h1>
+    <p>Pemungutan suara digital yang lebih cepat, praktis, dan transparan.</p>
+    <span class="status-pill {{ 'aktif' if status == 'AKTIF' else 'tutup' }}">PEMILU {{ status }}</span>
+  </div>
+  <div class="hero-icon">🗳️</div>
+</section>
+<div class="login-grid">
+  <section class="panel">
+    <h2>Login Mahasiswa</h2>
+    <p class="muted">Masuk menggunakan NIM yang sudah terdaftar.</p>
+    <form method="POST" action="{{ url_for('masuk_mahasiswa') }}">
+      <label>NIM</label>
+      <input name="nim" placeholder="Contoh: 2310631170001" required>
+      <button class="btn primary full">Login Mahasiswa</button>
+    </form>
+  </section>
+  <section class="panel">
+    <h2>Login Admin</h2>
+    <p class="muted">Khusus panitia pemilihan.</p>
+    <form method="POST" action="{{ url_for('masuk_admin') }}">
+      <label>Username</label>
+      <input name="username" placeholder="Username admin" required>
+      <label>Password</label>
+      <input type="password" name="password" placeholder="Password" required>
+      <button class="btn dark full">Login Admin</button>
+    </form>
+  </section>
+</div>
+<div class="note">
+  <strong>Data demonstrasi:</strong> NIM contoh tersedia dari
+  <code>2310631170001</code> sampai <code>2310631170500</code>.
+  Akun admin awal: <code>admin</code> / <code>admin123</code>.
+  Ganti password dan data contoh sebelum digunakan pada pemilihan sebenarnya.
+</div>
+{% endblock %}

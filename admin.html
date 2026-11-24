@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Dashboard Admin{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div><span class="eyebrow">PANEL PANITIA</span><h1>Dashboard Admin</h1>
+  <p class="muted">Kelola kandidat, pantau partisipasi, dan lihat hasil voting.</p></div>
+  <span class="status-pill {{ 'aktif' if status == 'AKTIF' else 'tutup' }}">PEMILU {{ status }}</span>
+</div>
+<div class="stats-grid">
+  <div class="stat-card"><span>Total Pemilih</span><strong>{{ total }}</strong></div>
+  <div class="stat-card"><span>Sudah Memilih</span><strong>{{ sudah }}</strong></div>
+  <div class="stat-card"><span>Belum Memilih</span><strong>{{ belum }}</strong></div>
+  <div class="stat-card"><span>Partisipasi</span><strong>{{ "%.1f"|format(partisipasi) }}%</strong></div>
+</div>
+
+<div class="panel">
+  <div class="panel-heading"><h2>Pengaturan Pemilu</h2></div>
+  <p>Status saat ini: <strong>{{ status }}</strong></p>
+  {% if status == 'AKTIF' %}
+    <form method="POST" action="{{ url_for('route_tutup_pemilu') }}"
+          onsubmit="return confirm('Yakin menutup pemungutan suara? Mahasiswa tidak dapat voting lagi.');">
+      <button class="btn danger">Tutup Pemilu</button>
+    </form>
+  {% else %}
+    <form method="POST" action="{{ url_for('route_buka_pemilu') }}"
+          onsubmit="return confirm('Aktifkan kembali pemilu?');">
+      <button class="btn primary">Aktifkan Kembali (mode pengujian)</button>
+    </form>
+    <a class="btn outline inline-btn" href="{{ url_for('hasil_publik') }}">Lihat Pengumuman Pemenang</a>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h2>Tambah Kandidat</h2>
+  <form method="POST" action="{{ url_for('route_tambah_kandidat') }}" class="form-grid">
+    <div><label>Nama Kandidat</label><input name="nama_calon" required></div>
+    <div><label>Program Studi</label><input name="program_studi" required></div>
+    <div><label>Angkatan</label><input type="number" name="angkatan" min="2000" max="2100" required></div>
+    <div class="wide"><label>Visi</label><textarea name="visi" required></textarea></div>
+    <div class="wide"><label>Misi</label><textarea name="misi" required></textarea></div>
+    <div class="wide"><button class="btn primary">Tambah Kandidat</button></div>
+  </form>
+</div>
+
+<div class="panel">
+  <h2>Kelola Kandidat</h2>
+  {% for calon in kandidat %}
+  <details class="edit-item">
+    <summary>{{ calon.nama_calon }} · Angkatan {{ calon.angkatan }} · {{ calon.total_suara }} suara</summary>
+    <form method="POST" action="{{ url_for('route_ubah_kandidat', id_kandidat=calon.id_kandidat) }}" class="form-grid edit-form">
+      <div><label>Nama</label><input name="nama_calon" value="{{ calon.nama_calon }}" required></div>
+      <div><label>Program Studi</label><input name="program_studi" value="{{ calon.program_studi }}" required></div>
+      <div><label>Angkatan</label><input type="number" name="angkatan" value="{{ calon.angkatan }}" required></div>
+      <div class="wide"><label>Visi</label><textarea name="visi" required>{{ calon.visi }}</textarea></div>
+      <div class="wide"><label>Misi</label><textarea name="misi" required>{{ calon.misi }}</textarea></div>
+      <div><button class="btn primary">Simpan Perubahan</button></div>
+    </form>
+    <form method="POST" action="{{ url_for('route_hapus_kandidat', id_kandidat=calon.id_kandidat) }}"
+          onsubmit="return confirm('Hapus kandidat ini?');">
+      <button class="btn danger">Hapus Kandidat</button>
+      <small class="muted">Kandidat yang sudah memperoleh suara tidak dapat dihapus.</small>
+    </form>
+  </details>
+  {% else %}<p>Belum ada kandidat.</p>{% endfor %}
+</div>
+
+<div class="panel">
+  <h2>Hasil Voting Real-Time</h2>
+  <p class="muted">Total suara masuk: {{ total_suara }}</p>
+  {% for item in hasil %}
+    <div class="result-row">
+      <div class="result-top"><strong>{{ item.nama_calon }}</strong><span>{{ item.total_suara }} suara · {{ "%.1f"|format(item.persentase) }}%</span></div>
+      <div class="bar"><div style="width: {{ item.persentase }}%"></div></div>
+    </div>
+  {% else %}<p>Belum ada data kandidat.</p>{% endfor %}
+</div>
+
+<div class="panel">
+  <h2>Data Pemilih</h2>
+  <p class="muted">Daftar pemilih terdaftar dan status penggunaan hak suara.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>NIM</th><th>Nama</th><th>Prodi</th><th>Angkatan</th><th>Status</th><th>Tanggal Vote</th></tr></thead>
+    <tbody>{% for p in pemilih %}
+      <tr><td>{{ p.nim }}</td><td>{{ p.nama }}</td><td>{{ p.program_studi }}</td>
+      <td>{{ p.angkatan }}</td><td>{{ 'Sudah' if p.sudah_memilih else 'Belum' }}</td>
+      <td>{{ p.tanggal_vote or '-' }}</td></tr>
+    {% endfor %}</tbody>
+  </table></div>
+</div>
+{% endblock %}

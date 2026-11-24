@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Hasil Pemilihan{% endblock %}
+{% block content %}
+<section class="hero compact">
+  <div><span class="eyebrow">PENGUMUMAN RESMI</span><h1>Hasil Pemilihan</h1>
+  <p>Pemungutan suara telah ditutup.</p></div><div class="hero-icon">🏆</div>
+</section>
+{% if pemenang %}
+<div class="winner">
+  <span>PEMENANG PEMILIHAN</span><h2>{{ pemenang.nama_calon }}</h2>
+  <p>{{ pemenang.total_suara }} suara · {{ "%.1f"|format(pemenang.persentase) }}%</p>
+</div>
+{% else %}
+<div class="panel"><h2>Belum ada suara masuk.</h2></div>
+{% endif %}
+<div class="panel">
+  <h2>Rekapitulasi Suara</h2>
+  <p>Total suara: {{ total_suara }}</p>
+  {% for item in hasil %}
+  <div class="result-row">
+    <div class="result-top"><strong>{{ item.nama_calon }}</strong><span>{{ item.total_suara }} suara · {{ "%.1f"|format(item.persentase) }}%</span></div>
+    <div class="bar"><div style="width: {{ item.persentase }}%"></div></div>
+  </div>
+  {% endfor %}
+</div>
+<a href="{{ url_for('index') }}" class="btn outline">Kembali ke Beranda</a>
+{% endblock %}

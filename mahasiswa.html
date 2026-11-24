@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Dashboard Mahasiswa{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div><span class="eyebrow">HALAMAN PEMILIH</span><h1>Halo, {{ pemilih.nama }}</h1>
+  <p class="muted">NIM: {{ pemilih.nim }} · {{ pemilih.program_studi }} · Angkatan {{ pemilih.angkatan }}</p></div>
+  <span class="status-pill {{ 'aktif' if status == 'AKTIF' else 'tutup' }}">PEMILU {{ status }}</span>
+</div>
+<div class="stats-grid two">
+  <div class="stat-card"><span>Status Voting</span>
+    <strong>{{ 'SUDAH MEMILIH' if pemilih.sudah_memilih else 'BELUM MEMILIH' }}</strong></div>
+  <div class="stat-card"><span>Tanggal Voting</span>
+    <strong class="small-stat">{{ pemilih.tanggal_vote or 'Belum ada' }}</strong></div>
+</div>
+<h2 class="section-title">Daftar Kandidat</h2>
+<div class="candidate-grid">
+{% for calon in kandidat %}
+  <article class="candidate-card">
+    <div class="candidate-number">KANDIDAT {{ loop.index }}</div>
+    <h2>{{ calon.nama_calon }}</h2>
+    <p class="muted">{{ calon.program_studi }} · Angkatan {{ calon.angkatan }}</p>
+    <h3>Visi</h3><p class="preline">{{ calon.visi }}</p>
+    <h3>Misi</h3><p class="preline">{{ calon.misi }}</p>
+    {% if status == 'AKTIF' and not pemilih.sudah_memilih %}
+      <form method="POST" action="{{ url_for('vote', id_kandidat=calon.id_kandidat) }}"
+            onsubmit="return confirm('Anda memilih {{ calon.nama_calon }}. Yakin mengirim suara? Pilihan tidak dapat diubah.');">
+        <button class="btn primary full">Pilih Kandidat Ini</button>
+      </form>
+    {% elif pemilih.sudah_memilih %}
+      <button class="btn disabled full" disabled>Hak suara sudah digunakan</button>
+    {% else %}
+      <button class="btn disabled full" disabled>Pemilu telah ditutup</button>
+    {% endif %}
+  </article>
+{% else %}
+  <p>Belum ada kandidat yang terdaftar.</p>
+{% endfor %}
+</div>
+{% endblock %}

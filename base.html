@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}E-Vote Mahasiswa{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<nav class="navbar">
+  <a class="brand" href="{{ url_for('index') }}">🗳️ E-VOTE MAHASISWA</a>
+  <div>
+    {% if session.get('role') %}
+      <span class="nav-user">{{ session.get('nama') or session.get('username') }}</span>
+      <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+    {% else %}
+      <a class="nav-link" href="{{ url_for('index') }}">Beranda</a>
+    {% endif %}
+  </div>
+</nav>
+<main class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+<footer>E-Vote Mahasiswa · Final Project Dasar Pemrograman</footer>
+</body>
+</html>
